@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            #container{
+                display: grid;
+                grid-template-columns: repeat(20, 15px);
+                grid-template-rows: repeat(20, 15px);
+            }
+            .box{
+                width: 15px;
+                height: 15px;
+                border: 1px solid black;
+                position: relative;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="container"></div>
+        <button onclick="traverse()">Traverse</button>
+
+        <script>
+            let sourcePos = {row: -1, col: -1};
+            let destPos = {row:-1, col: -1};
+            let walls = new Set();
+
+            function traverse() {
+                const container = document.getElementById('container');
+                const boxes = container.getElementsByClassName('box');
+                const totalBoxes = boxes.length;
+                let currentBoxIndex = 0;
+              
+                let row = 0;
+                let col = 0;
+                let deltaRow = 0;
+                let deltaCol = 1;
+              
+                for (let i = 0; i < totalBoxes; i++) {
+                  boxes[i].style.backgroundColor = 'white';
+              }
+              
+              
+                function setColor() {
+                  const progress = currentBoxIndex / totalBoxes;
+                  const hue = progress * 360;
+                  const saturation = '100%';
+                  const lightness = '50%';
+                  const color = `hsl(${hue}, ${saturation}, ${lightness})`;
+                  boxes[currentBoxIndex].style.backgroundColor = color;
+                }
+              
+                function move() {
+                  row += deltaRow;
+                  col += deltaCol;
+              
+                  if (row < 0 || col < 0 || row >= 20 || col >= 20 || walls.has(row * 20 + col)) {
+                    row -= deltaRow;
+                    col -= deltaCol;
+              
+                    const temp = deltaRow;
+                    deltaRow = deltaCol;
+                    deltaCol = -temp;
+              
+                    row += deltaRow;
+                    col += deltaCol;
+                  }
+              
+                  currentBoxIndex = row * 20 + col;
+              
+                  if (currentBoxIndex < totalBoxes) {
+                    setColor();
+                    setTimeout(move, 10);
+                  }
+                }
+              
+                move();
+              }
+              window.onload = function() {
+                const container = document.getElementById('container');
+                for (let i = 0; i < 400; i++) {
+                  const box = document.createElement('div');
+                  box.classList.add('box');
+                  box.dataset.index = i;
+                  container.appendChild(box);
+                }
+              
+                container.addEventListener('click', function(event) {
+                  const box = event.target;
+                  if (box.classList.contains('box')) {
+                    const index = parseInt(box.dataset.index);
+                    const row = Math.floor(index / 100);
+                    const col = index % 100;
+              
+                    if (!sourcePos.row && !sourcePos.col) {
+                      sourcePos = {row, col};
+                      document.getElementById('source').style.top = row * 15 + 'px';
+                      document.getElementById('source').style.left = col * 15 + 'px';
+                    } else if (!destPos.row && !destPos.col) {
+                      destPos = {row, col};
+                      document.getElementById('destination').style.top = row * 15 + 'px';
+                      document.getElementById('destination').style.left = col * 15 + 'px';
+                    } else {
+                      walls.add(index);
+                      box.style.backgroundColor = 'black';
+                    }
+                  }
+                });
+              }
+        </script>
+    </body>
+</html>
