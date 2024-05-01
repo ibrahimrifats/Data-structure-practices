@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spiral Traverse</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+         
+    }
+    
+    #background-video {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -1;
+    }
+
+  #container {
+  display: grid;
+  grid-template-columns: repeat(100, 15px);
+  grid-template-rows: repeat(100, 15px);
+}
+
+.box {
+  width: 15px;
+  height: 15px;
+   
+  border: 1px solid black;
+  position: relative;
+}
+
+#source, #destination {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+#source {
+  background-color: blue;
+}
+
+#destination {
+  background-color: red;
+}
+
+</style>
+</head>
+<body>
+
+     
+
+
+<div id="container"></div>
+<button onclick="traverse()">Traverse</button>
+<button onclick="clearPath()">Clear Path</button>
+
+
+<script>
+let sourcePos = {row: -1, col: -1};
+let destPos = {row: -1, col: -1};
+let walls = new Set();
+
+function traverse() {
+  const container = document.getElementById('container');
+  const boxes = container.getElementsByClassName('box');
+  const totalBoxes = boxes.length;
+  let currentBoxIndex = 0;
+
+  let row = 0;
+  let col = 0;
+  let deltaRow = 0;
+  let deltaCol = 1;
+
+  for (let i = 0; i < totalBoxes; i++) {
+    boxes[i].style.backgroundColor = 'white';
+}
+
+
+  function setColor() {
+    const progress = currentBoxIndex / totalBoxes;
+    const hue = progress * 360;
+    const saturation = '100%';
+    const lightness = '50%';
+    const color = `hsl(${hue}, ${saturation}, ${lightness})`;
+    boxes[currentBoxIndex].style.backgroundColor = color;
+  }
+
+  function move() {
+    row += deltaRow;
+    col += deltaCol;
+
+    if (row < 0 || col < 0 || row >= 100 || col >= 100 || walls.has(row * 100 + col) || boxes[row * 100 + col].style.backgroundColor !== 'white') {
+      row -= deltaRow;
+      col -= deltaCol;
+
+      const temp = deltaRow;
+      deltaRow = deltaCol;
+      deltaCol = -temp;
+
+      row += deltaRow;
+      col += deltaCol;
+    }
+
+    currentBoxIndex = row * 100 + col;
+
+    if (currentBoxIndex < totalBoxes) {
+      setColor();
+      setTimeout(move, 10);
+    }
+  }
+
+  move();
+}
+
+function clearPath() {
+  const container = document.getElementById('container');
+  const boxes = container.getElementsByClassName('box');
+  const totalBoxes = boxes.length;
+
+  for (let i = 0; i < totalBoxes; i++) {
+    if (!walls.has(i)) {
+      boxes[i].style.backgroundColor = 'white';
+    }
+  }
+}
+
+window.onload = function() {
+  const container = document.getElementById('container');
+  for (let i = 0; i < 10000; i++) {
+    const box = document.createElement('div');
+    box.classList.add('box');
+    box.dataset.index = i;
+    container.appendChild(box);
+  }
+
+  container.addEventListener('click', function(event) {
+    const box = event.target;
+    if (box.classList.contains('box')) {
+      const index = parseInt(box.dataset.index);
+      const row = Math.floor(index / 100);
+      const col = index % 100;
+
+      if (!sourcePos.row && !sourcePos.col) {
+        sourcePos = {row, col};
+        document.getElementById('source').style.top = row * 5 + 'px';
+        document.getElementById('source').style.left = col * 5 + 'px';
+      } else if (!destPos.row && !destPos.col) {
+        destPos = {row, col};
+        document.getElementById('destination').style.top = row * 5 + 'px';
+        document.getElementById('destination').style.left = col * 5 + 'px';
+      } else {
+        walls.add(index);
+        box.style.backgroundColor = 'black';
+      }
+    }
+  });
+}
+</script>
+<div id="source"></div>
+<div id="destination"></div>
+</body>
+</html>
