@@ -1,15 +1,15 @@
-def reverse(array, n_times):
+def reverse(array):
     low = 0 
-    high = 1 
-    while low<high:
-        temp=array[low]
+    high = len(array) - 1 
+    while low < high:
+        temp = array[low]
         array[low] = array[high]
         array[high] = temp 
-        low+=1
-        high-=1 
+        low += 1
+        high -= 1 
     return array 
 
 array = [10, 5, 7, 30]
 
-reverse = reverse(array, 3)
-print(reverse)
+reversed_array = reverse(array)
+print(reversed_array)
